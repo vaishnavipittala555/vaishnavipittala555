@@ -1,0 +1,677 @@
+# Setting the working directory and loading the dataset
+setwd("/Users/vaishnavipittala/Desktop/stats")
+studentdata <- read.table("outstationstudentstress.csv", header=T, sep=",")
+
+# Checking the class and structure of the dataset
+class(studentdata)
+str(studentdata)
+
+# Creating a working dataframe without the first and last columns (if not needed)
+stud.df <- studentdata[,-c(1,ncol(studentdata))]
+stud.df
+
+# Renaming columns for better readability and understanding
+names(stud.df) <- c("Agreed_to_participate",
+                    "Name",
+                    "Age",
+                    "Gender",
+                    "Pursuing_Undergrad_or_Postgrad",
+                    "Year_of_Study",
+                    "Travel_Time_to_University_Minutes",
+                    "Hometown_to_University_Hours",
+                    "Outstation_Student",
+                    "Resilience_Score",
+                    "Stress_Management_Score",
+                    "Perceived_Stress_Scale")
+str(stud.df)
+
+# Data cleaning and standardization process begins here
+# Displaying the first 5 columns to check for data inconsistencies
+stud.df[,1:5]
+
+# Cleaning categorical columns: Agreed_to_participate, Gender, Pursuing_Undergrad_or_Postgrad, etc.
+# Cleaning 'Agreed_to_participate' column.
+stud.df$Agreed_to_participate[stud.df$Agreed_to_participate == "Y"] <- "Yes"
+stud.df$Agreed_to_participate[stud.df$Agreed_to_participate == "N"] <- "No"
+stud.df$Agreed_to_participate
+
+# Cleaning 'Gender' column
+stud.df$Gender[stud.df$Gender == "F"] <- "Female"
+stud.df$Gender[stud.df$Gender == "M"] <- "Male"
+stud.df$Gender[stud.df$Gender == "female"] <- "Female"
+stud.df$Gender[stud.df$Gender == "male"] <- "Male"
+stud.df$Gender[stud.df$Gender == "Female "] <- "Female"
+stud.df$Gender[stud.df$Gender == "Male "] <- "Male"
+stud.df$Gender
+
+# Cleaning 'Pursuing_Undergrad_or_Postgrad' column
+stud.df$Pursuing_Undergrad_or_Postgrad[stud.df$Pursuing_Undergrad_or_Postgrad == "ug"] <- "Under graduation"
+stud.df$Pursuing_Undergrad_or_Postgrad[stud.df$Pursuing_Undergrad_or_Postgrad == "pg"] <- "Post graduation"
+stud.df$Pursuing_Undergrad_or_Postgrad[stud.df$Pursuing_Undergrad_or_Postgrad == "bsc"] <- "Under graduation"
+stud.df$Pursuing_Undergrad_or_Postgrad
+
+# Convert 'Pursuing_Undergrad_or_Postgrad' column to a factor for categorical representation
+as.factor(stud.df$Pursuing_Undergrad_or_Postgrad)
+
+# Selecting columns 6 to 12 of the dataframe
+stud.df[,6:12]
+
+# Standardizing entries in columns 'Travel_Time_to_University_Minutes' and 'Pursuing_Undergrad_or_Postgrad'
+stud.df$Travel_Time_to_University_Minutes[stud.df$Travel_Time_to_University_Minutes  == "2ND"] <- "2"
+stud.df$Travel_Time_to_University_Minutes[stud.df$Travel_Time_to_University_Minutes  == "2nd"] <- "2"
+stud.df$Pursuing_Undergrad_or_Postgrad[stud.df$Pursuing_Undergrad_or_Postgrad == "pg"] <- "Post graduation"
+stud.df$Pursuing_Undergrad_or_Postgrad[stud.df$Pursuing_Undergrad_or_Postgrad == "bsc"] <- "Under graduation"
+stud.df$Pursuing_Undergrad_or_Postgrad
+
+# Handling non-numeric entries and missing values in 'Year_of_Study' and 'Travel_Time_to_University_Minutes' columns
+as.numeric(stud.df$Year_of_Study)
+is.na(as.numeric(stud.df$Year_of_Study))
+stud.df$Year_of_Study[stud.df$Year_of_Study == "2ND"] <- "2"
+stud.df$Year_of_Study[stud.df$Year_of_Study == "2nd"] <- "2"
+stud.df$Year_of_Study
+
+# Converting 'Travel_Time_to_University_Minutes' column to numeric type
+as.numeric(stud.df$Travel_Time_to_University_Minutes)
+
+# Checking for missing values in the numeric conversion of 'Travel_Time_to_University_Minutes'
+is.na(as.numeric(stud.df$Travel_Time_to_University_Minutes))
+
+# Finding the index of missing values in the converted column
+idx <- which(is.na(as.numeric(stud.df$Travel_Time_to_University_Minutes)))
+
+# showing rows with missing values in 'Travel_Time_to_University_Minutes'
+stud.df$Travel_Time_to_University_Minutes[idx]
+cbind(idx, stud.df$Travel_Time_to_University_Minutes[idx])
+
+# Assigning specific values to missing entries at index 3 and 19 in 'Travel_Time_to_University_Minutes'
+stud.df$Travel_Time_to_University_Minutes[3] <- 60
+stud.df$Travel_Time_to_University_Minutes[19] <- 0
+
+# Converting 'Hometown_to_University_Hours' column to numeric type
+as.numeric(stud.df$Hometown_to_University_Hours)
+
+# Checking for missing values in the numeric conversion of 'Hometown_to_University_Hours'
+is.na(as.numeric(stud.df$Hometown_to_University_Hours))
+
+# Finding the indices of missing values in the converted column
+idx <- which(is.na(as.numeric(stud.df$Hometown_to_University_Hours)))
+
+# Displaying rows with missing values in 'Hometown_to_University_Hours'
+stud.df$Hometown_to_University_Hours[idx]
+cbind(idx, stud.df$Hometown_to_University_Hours[idx])
+
+stud.df$Hometown_to_University_Hours[1] <- 9
+stud.df$Hometown_to_University_Hours[2] <- 3
+stud.df$Hometown_to_University_Hours[4] <- 4
+stud.df$Hometown_to_University_Hours[5] <- 5
+
+#To see the columns from 6 to 12.
+stud.df[,6:12]
+
+# Converting 'Outstation_Student' column to boolean values
+stud.df$Outstation_Student <- ifelse(stud.df$Outstation_Student == "Yes", TRUE, FALSE)
+stud.df$Outstation_Student
+
+# Creating a new column 'local' based on 'Outstation_Student' values
+ifelse((stud.df$Outstation_Student == "Yes" | stud.df$Outstation_Student == "No"), "Local", "Non Local")
+stud.df$Outstation_Student
+cbind(stud.df$Outstation_Student, stud.df$local)
+
+# Removing entries where students are not outstation students
+stud.df <- stud.df[stud.df$Outstation_Student != "FALSE", ]
+stud.df
+
+# Writing the cleaned dataframe to a new CSV file
+write.csv(stud.df, "outstationstudentsstress.csv", row.names=TRUE)
+summary(stud.df)
+
+#Q1 to Q16: Various statistical questions and summaries on the cleaned data, 
+# including counts, means, and tables related to different columns and criteria.
+
+#Q1: How many students upto age of 25?
+table(stud.df$Age) 
+round(prop.table(table(stud.df$Age)),25)*100
+
+#Q2:How many students are male and how many are female?
+table(stud.df$Gender)
+
+#Q3:How many students are pursuing undergraduation/Postgraduation?
+table(stud.df$Pursuing_Undergrad_or_Postgrad)
+
+#Q4:Which year of masters/bachelors are students in?
+table(stud.df$Year_of_Study)
+
+#Q5: How many students coming from travelling less than an hour everyday? 
+ 
+round(prop.table(table(stud.df$Travel_Time_to_University_Minutes)),60)*100
+table(stud.df$Travel_Time_to_University_Minutes)
+
+#Q6: How many hours is your hometown from the university?
+table(stud.df$Hometown_to_University_Hours)
+
+#Q7:How many out of station students are there?
+table(stud.df$Outstation_Student)
+
+#Q8:How many students are in undergraduate, postgraduate and what year are they studying in?
+table(stud.df$Pursuing_Undergrad_or_Postgrad, stud.df$Year_of_Study)
+
+#Q9:Mean resilience score of Post graduate students is?
+mean(stud.df$Resilience_Score[stud.df$Pursuing_Undergrad_or_Postgrad == "Post graduation"], na.rm = TRUE)
+
+#Q10:Mean resilience score of Under graduate students is?
+mean(stud.df$Resilience_Score[stud.df$Pursuing_Undergrad_or_Postgrad == "Under graduation"], na.rm = TRUE)
+aggregate(x = stud.df$Resilience_Score, by = list(Way = stud.df$Pursuing_Undergrad_or_Postgrad), FUN = mean, na.rm = TRUE)
+
+#Q11:Mean stress management levels of students postgraduate students  is?
+mean(stud.df$Stress_Management_Score[stud.df$Pursuing_Undergrad_or_Postgrad == "Post graduation"], na.rm = TRUE)
+
+#Q12:Mean stress management levels of students postgraduate students  is?
+mean(stud.df$Stress_Management_Score[stud.df$Pursuing_Undergrad_or_Postgrad == "Under graduation"], na.rm = TRUE)
+aggregate(x = stud.df$Stress_Management_Score, by = list(Way = stud.df$Pursuing_Undergrad_or_Postgrad), FUN = mean, na.rm = TRUE)
+
+#Q13:Mean percieved stress level scores of postgraduate students is?
+mean(stud.df$Perceived_Stress_Scale[stud.df$Pursuing_Undergrad_or_Postgrad == "Post graduation"], na.rm = TRUE)
+
+#Q14:Mean percieved stress level scores of undergraduate students is?
+mean(stud.df$Perceived_Stress_Scale[stud.df$Pursuing_Undergrad_or_Postgrad == "Under graduation"], na.rm = TRUE)
+aggregate(x = stud.df$Perceived_Stress_Scale, by = list(Way = stud.df$Pursuing_Undergrad_or_Postgrad), FUN = mean, na.rm = TRUE)
+
+#Q15:What is the resilience, stress management score,  perceived stress scale of students who are below 28.
+subset(stud.df , age < 28, select = c(Resilience_Score, Stress_Management_Score, Perceived_Stress_Scale))
+
+#Q16: what is the mean resilience, stress management and percieved stress of the undergraduate and postgraduate out of station students?
+aggregate(cbind(Resilience_Score, Stress_Management_Score, Perceived_Stress_Scale) ~ Pursuing_Undergrad_or_Postgrad, data = stud.df, FUN = mean, na.rm = TRUE)
+
+
+#Legend in plot
+
+outstation_gender <- table(stud.df$Outstation_Student, stud.df$Gender)
+outstation_education <- table(stud.df$Outstation_Student, stud.df$Pursuing_Undergrad_or_Postgrad)
+
+# Check the content of the tables to ensure they're created correctly
+outstation_gender
+outstation_education
+
+# Creating grouped bar plots
+par(mfrow=c(1,2))  # Setting up a 1x2 layout for side-by-side plots
+
+# Grouped bar plot for outstation students by gender
+barplot(outstation_gender, 
+        beside=TRUE,
+        main="Outstation Student by Gender",
+        xlab="Outstation Student",
+        ylab="Frequency",
+        col=c("blue", "green"),
+        legend=c("Male", "Female"))
+
+# Grouped bar plot for outstation students by education level
+barplot(outstation_education, 
+        beside=TRUE,
+        main="Outstation Student by Education",
+        xlab="Outstation Student",
+        ylab="Frequency",
+        col=c("orange", "purple"),
+        legend=c("Undergrad", "Postgrad"))
+
+
+par(mfrow=c(1,1)) 
+# Resetting the layout to default
+#mean variance
+"Resilience_Score",
+"Stress_Management_Score",
+"Perceived_Stress_Scale"
+mean(stud.df$Resilience_Score)
+mean(stud.df$Stress_Management_Score
+mean(stud.df$Perceived_Stress_Scale)
+# Variance
+var(stud.df$Resilience_Score) # unbiased sample variance
+
+ssq <- mean(stud.df$Resilience_Score^2) - mean(stud.df$Resilience_Score)^2
+(length(stud.df$Resilience_Score)/(length(stud.df$Resilience_Score)-1)) * ssq
+
+# Median
+median(stud.df$Resilience_Score)
+
+# Quantiles
+quantile(stud.df$Resilience_Score)
+quantile(stud.df$Resilience_Score, p = 0.4)
+
+# Summary statistics
+summary(stud.df$Resilience_Score)
+
+# Variance for Stress_Management_Score
+var(stud.df$Stress_Management_Score) # unbiased sample variance
+
+ssq <- mean(stud.df$Stress_Management_Score^2) - mean(stud.df$Stress_Management_Score)^2
+(length(stud.df$Stress_Management_Score)/(length(stud.df$Stress_Management_Score)-1)) * ssq
+
+# Median
+median(stud.df$Stress_Management_Score)
+
+# Quantiles
+quantile(stud.df$Stress_Management_Score)
+quantile(stud.df$Stress_Management_Score, p = 0.4)
+
+# Summary statistics
+summary(stud.df$Stress_Management_Score)
+
+
+# Variance for Perceived_Stress_Scale
+var(stud.df$Perceived_Stress_Scale) # unbiased sample variance
+
+ssq <- mean(stud.df$Perceived_Stress_Scale^2) - mean(stud.df$Perceived_Stress_Scale)^2
+(length(stud.df$Perceived_Stress_Scale)/(length(stud.df$Perceived_Stress_Scale)-1)) * ssq
+
+# Median
+median(stud.df$Perceived_Stress_Scale)
+
+# Quantiles
+quantile(stud.df$Perceived_Stress_Scale)
+quantile(stud.df$Perceived_Stress_Scale, p = 0.4)
+
+# Summary statistics
+summary(stud.df$Perceived_Stress_Scale)
+
+# Boxplot for Resilience_Score
+boxplot(stud.df$Resilience_Score, main='Boxplot of Resilience Score')
+
+# Boxplot for Stress_Management_Score
+boxplot(stud.df$Stress_Management_Score, main='Boxplot of Stress Management Score')
+
+# Boxplot for Perceived_Stress_Scale
+boxplot(stud.df$Perceived_Stress_Scale, main='Boxplot of Perceived Stress Scale')
+
+
+###Covariance, correlation, Scatterplot
+# Assuming these variables are in the dataframe 'stud.df'
+covariance_res_stress <- cov(stud.df$Resilience_Score, stud.df$Stress_Management_Score)
+covariance_res_perceived <- cov(stud.df$Resilience_Score, stud.df$Perceived_Stress_Scale)
+covariance_stress_perceived <- cov(stud.df$Stress_Management_Score, stud.df$Perceived_Stress_Scale)
+
+# Calculate covariance using the formula
+covariance_res_stress_formula <- mean(stud.df$Resilience_Score * stud.df$Stress_Management_Score) -
+  mean(stud.df$Resilience_Score) * mean(stud.df$Stress_Management_Score)
+
+covariance_res_perceived_formula <- mean(stud.df$Resilience_Score * stud.df$Perceived_Stress_Scale) -
+  mean(stud.df$Resilience_Score) * mean(stud.df$Perceived_Stress_Scale)
+
+covariance_stress_perceived_formula <- mean(stud.df$Stress_Management_Score * stud.df$Perceived_Stress_Scale) -
+  mean(stud.df$Stress_Management_Score) * mean(stud.df$Perceived_Stress_Scale)
+
+# Display the calculated covariances
+print(covariance_res_stress)
+print(covariance_res_perceived)
+print(covariance_stress_perceived)
+
+# Display the calculated covariances using the formula
+print(covariance_res_stress_formula)
+print(covariance_res_perceived_formula)
+print(covariance_stress_perceived_formula)
+
+# Calculate correlation
+correlation_res_stress <- cor(stud.df$Resilience_Score, stud.df$Stress_Management_Score)
+correlation_res_perceived <- cor(stud.df$Resilience_Score, stud.df$Perceived_Stress_Scale)
+correlation_stress_perceived <- cor(stud.df$Stress_Management_Score, stud.df$Perceived_Stress_Scale)
+
+# Display the calculated correlations
+print(correlation_res_stress)
+print(correlation_res_perceived)
+print(correlation_stress_perceived)
+
+# Scatterplot for Resilience_Score vs. Stress_Management_Score
+plot(stud.df$Resilience_Score, stud.df$Stress_Management_Score,
+     xlab = "Resilience Score", ylab = "Stress Management Score",
+     main = "Scatterplot: Resilience vs. Stress Management",
+     col = "blue", pch = 16)
+
+# Scatterplot for Resilience_Score vs. Perceived_Stress_Scale
+plot(stud.df$Resilience_Score, stud.df$Perceived_Stress_Scale,
+     xlab = "Resilience Score", ylab = "Perceived Stress Scale",
+     main = "Scatterplot: Resilience vs. Perceived Stress",
+     col = "green", pch = 16)
+
+# Scatterplot for Stress_Management_Score vs. Perceived_Stress_Scale
+plot(stud.df$Stress_Management_Score, stud.df$Perceived_Stress_Scale,
+     xlab = "Stress Management Score", ylab = "Perceived Stress Scale",
+     main = "Scatterplot: Stress Management vs. Perceived Stress",
+     col = "red", pch = 16)
+#?par
+
+##
+##How to save graphs
+##Multiple panel plots
+##
+# Set up the layout for multiple panel plots
+par(mfrow=c(1,3))
+
+# Plot Resilience_Score
+plot(stud.df$Resilience_Score, col="blue", pch=16,
+     xlab="Index", ylab="Resilience Score", main="Resilience Score")
+
+# Plot Stress_Management_Score
+plot(stud.df$Stress_Management_Score, col="red", pch=16,
+     xlab="Index", ylab="Stress Management Score", main="Stress Management Score")
+
+# Plot Perceived_Stress_Scale
+plot(stud.df$Perceived_Stress_Scale, col="green", pch=16,
+     xlab="Index", ylab="Perceived Stress Scale", main="Perceived Stress Scale")
+
+# Resetting the layout to default
+par(mfrow=c(1,1))
+
+# Save the plots (change file names and formats as needed)
+png("Resilience_Stress_PerceivedStress_Plot.png")
+# Re-plot the graphs to save them
+plot(stud.df$Resilience_Score, col="blue", pch=16,
+     xlab="Index", ylab="Resilience Score", main="Resilience Score")
+dev.off()
+
+png("StressManagement_Stress_PerceivedStress_Plot.png")
+plot(stud.df$Stress_Management_Score, col="red", pch=16,
+     xlab="Index", ylab="Stress Management Score", main="Stress Management Score")
+dev.off()
+
+png("PerceivedStress_Resilience_StressManagement_Plot.png")
+plot(stud.df$Perceived_Stress_Scale, col="green", pch=16,
+     xlab="Index", ylab="Perceived Stress Scale", main="Perceived Stress Scale")
+dev.off()
+
+
+#Distributions
+#normal 
+#cdf normal distribution
+pnorm(0) 
+pnorm(2)
+pnorm(0, mean = 1, sd = sqrt(2))
+#cdf student t distribution
+pt(0, df=3)
+
+#quantile
+qnorm(1/2)
+qnorm(pnorm(2))
+qt(p=.3, df=3)
+#random draw
+rnorm(4)
+#bernoulli distribution: binomial with size = 1
+rbinom(n = 10, size = 1, prob = 0.5)   
+
+#density
+dnorm(x=0)
+
+##Inference!
+
+#test in R and other things
+# #Normality test
+# hist(iris$Sepal.Width, freq=F)
+# lines(density(iris$Sepal.Width), lwd=2) 
+# abline(v=mean(iris$Sepal.Width), col='red', lwd=3)
+# curve(dnorm(x, mean=mean(iris$Sepal.Width), sd=sd(iris$Sepal.Width)), add=T, col="orange", lwd=2)
+# 
+# #Normality test
+# shapiro.test(iris$Sepal.Width)
+# #another way
+# qqnorm(iris$Sepal.Width)
+# qqline(iris$Sepal.Width)
+
+#Qualitative assessment
+hist(df$age, freq=F)
+lines(density(df$age), lwd=2) 
+#estimate mean age
+mean(df$age)
+sd(df$age)
+abline(v=mean(df$age), col='red', lwd=3)
+curve(dnorm(x, mean=mean(df$age), 
+            sd=sd(df$age)), 
+      add=T, col="orange", lwd=2)
+
+#Normality test
+shapiro.test(df$age)
+
+#another way
+qqnorm(df$age)
+qqline(df$age)
+
+###
+set.seed(123)
+
+vec<- c("a", "b", "c", "d")
+set.seed(26710)
+sample(vec, size = 1)
+
+data_norm <- rnorm(n=30)
+data_norm
+hist(data_norm, freq = F)
+lines(density(data_norm))
+abline(v=mean(data_norm), col="red", lwd=2)
+curve(dnorm(x, mean=mean(data_norm), 
+            sd=sd(data_norm)), add=T, col="blue")
+
+shapiro.test(data_norm)
+qqnorm(data_norm)
+qqline(data_norm)
+
+#Inference on the mean of a normal population 
+#with known variance
+#assume we know that the variance of age is 2.5^2
+#point estimation
+#estimate mean age
+mean(df$age)
+v <- 2.5^2
+#measure of accuracy
+n <- nrow(df)
+length(df$age)
+
+sqrt(v/nrow(df))
+#95% confidence interval 
+alpha=0.05
+lower <- mean(df$age) - qnorm(p=1-alpha/2) * 
+  sqrt(v/nrow(df))
+upper <- mean(df$age) + qnorm(p=1-alpha/2) * 
+  sqrt(v/nrow(df))
+round(c(lower, upper), 2)
+#test whether the mean age is significantly 
+#different from 23 years (2%significance level)
+tsobs <- (mean(df$age)-23)/sqrt(v/nrow(df))
+#Reject H0 if 
+tsobs< -qnorm(p=1-0.02/2)
+tsobs> qnorm(p=1-0.02/2)
+#Reject H0 at 2%significance level
+#calculate the p-value
+2*(1-pnorm(abs(tsobs)))
+
+#we can also use z.test
+#install.packages("BSDA")
+library(BSDA)
+require(BSDA)
+
+z.test(df$age, sigma.x = sqrt(v), mu = 23)
+
+z1 <- z.test(x = df$age, sigma.x = sqrt(v), 
+             mu=23, 
+             alternative = "two.sided", 
+             conf.level = 0.95)
+z1
+
+z1$statistic
+tsobs
+
+z1$p.value
+2*(1-pnorm(abs(tsobs)))
+
+z1$conf.int
+c(lower, upper)
+
+z1$estimate
+z1$alternative
+
+
+# Inference on the mean of a normal population
+# unknown variance
+
+#estimate mean age
+mean(df$age)
+#measure of accuracy
+sd(df$age)/sqrt(nrow(df))
+#99% confidence interval 
+alpha=0.01
+lower <- mean(df$age) - qt(p=1-alpha/2, df=nrow(df)-1) *
+  sd(df$age)/sqrt(nrow(df))
+upper <- mean(df$age) + qt(p=1-alpha/2, df=nrow(df)-1) * 
+  sd(df$age)/sqrt(nrow(df))
+round(c(lower, upper), 2)
+#test whether the mean age is 
+#significantly different from 23 years 
+#(2%significance level)
+tsobs <- (mean(df$age)-23)/(sd(df$age)/sqrt(nrow(df)))
+#Reject H0 if 
+tsobs< -qt(p=1-0.02/2, df=nrow(df)-1)
+tsobs> qt(p=1-0.02/2, df=nrow(df)-1)
+#Reject H0 at 2%significance level
+2*(1-pt(abs(tsobs), df=nrow(df)-1))
+
+#we can also use t.test
+t.test(x = df$age, mu = 23, conf.level = 0.99)
+t1 <- t.test(df$age, mu = 23, alternative = "two.sided",
+             conf.level = 0.99)
+t1$statistic
+tsobs
+
+t1$parameter #degrees of freedom
+
+t1$p.value
+
+t1$conf.int
+c(lower, upper)
+
+t1$stderr
+
+t1$estimate + t1$stderr*qt(1-0.05/2, df=28)
+t1$estimate - t1$stderr*qt(1-0.05/2, df=28)
+
+#inference on bernoulli population
+#estimate the population proportion/probability that a student can use R
+pi <- mean(df$use_R)
+pi
+sum(df$use_R)/length(df$use_R)
+#measure of accuracy
+sqrt((pi*(1-pi))/nrow(df))
+#check np n(1-p)
+nrow(df)*pi
+nrow(df)*(1-pi)
+#ok
+#Test whether the true population proportion is 
+# equal to 0.2 against the alternative that it is greater
+pi0=0.2
+tsobs <- (mean(df$use_R)-pi0)/sqrt((pi0*(1-pi0))/nrow(df))
+z.test(x = df$use_R, 
+       alternative="greater", mu=pi0, 
+       sigma.x = sqrt((pi0*(1-pi0))),  
+       conf.level = 0.99)
+
+
+
+
+##test the variance of a normal population
+#install.packages("EnvStats")
+library(EnvStats)
+varTest(df$age, alternative="two.sided", sigma.squared = 4,
+        conf.level = 0.99)
+
+((length(df$age)-1)*var(df$age))/qchisq(0.01/2, df = length(df$age)-1)
+((length(df$age)-1)*var(df$age))/qchisq(1-0.01/2, df = length(df$age)-1)
+
+
+
+
+#### two samples ####
+
+df$age
+agelastyear
+
+#is the mean age different?
+#First : assume known variance
+ztest <- z.test(x = df$age, y = agelastyear, 
+                alternative = "two.sided",
+                mu = 0, sigma.x = 2, sigma.y = 1.5, conf.level = 0.99)
+#looking at the p-value we can not reject H0
+
+ztest$statistic
+ztest$p.value
+ztest$conf.int
+
+# do not assume known variance: t-test
+t.test(x = df$age, y = agelastyear, alternative = "two.sided",
+       mu=0, var.equal=T, conf.level = 0.99)
+#Same conclusion
+
+#two sample test on the proportion
+#assume sample data 
+set.seed(123)
+useRlastyear <- rbinom(n = 25, size = 1, prob = 0.35)
+
+n1 <- length(df$use_R)
+n2 <- length(useRlastyear)
+p1 <- sum(df$use_R)/n1
+p2 <- sum(useRlastyear)/n2
+
+aa <- prop.test(x = c(sum(df$use_R), sum(useRlastyear)),
+                n = c(n1, n2), 
+                alternative = "two.sided", correct = F)
+aa
+#P-value > 0.1 
+# no evidence against h0
+# can not reject h0 that the proportions are equal
+aa$p.value
+
+##Two sample test on the variance
+var.test(x = df$age, y = agelastyear, ratio = 1, 
+         alternative = "two.sided")
+
+
+
+##Chi square test
+?chisq.test
+
+row1 <- c(762, 327, 468)
+row2 <- c(484, 239, 477)
+tab <- rbind(row1, row2)
+rownames(tab) <- c("F", "M")
+colnames(tab) <- c("Democrat", "Independent", "Republican")
+tab
+
+chi <- chisq.test(tab)
+
+chi$p.value
+2.953589*10^(-7)
+
+#1) independence
+#Create a sample dataset with 4 variables and 100 statistical units
+#grade (quantitative), gender, mark (is grade but categorized), bodyweight
+set.seed(123)
+grade <- sample(seq(18,31), size=100, replace = T)
+gender <- rbinom(n=100, 1, prob=1/3)
+gender <- ifelse(gender == 0, "M", "F")
+mark <- cut(grade, breaks = c(17, 23, 26, 31), labels = c("low", "medium", "high"))
+bw=round(rnorm(100, 58, 2), 1)
+df_s <- data.frame(gender, mark, grade, bw)  #This is the sample dataset
+
+#check if there exists association between gender and mark
+chisq.test(table(df_s$gender, df_s$mark))
+ctest <-chisq.test(table(df_s$gender, df_s$mark))
+ctest$statistic
+#calculate cramer V
+sqrt(ctest$statistic/(100))
+ctest$parameter
+ctest$p.value
+ctest$observed
+ctest$expected
+ctest$residuals
+sum((ctest$residuals^2))
+
+
+##Correlation test - make inference on the correlation parameter
+cor(df_s$grade, df_s$bw)
+cor.test(df_s$grade, df_s$bw, 
+         alternative = "two.sided")
+a <- cor.test(df_s$grade, df_s$bw, alternative = "two.sided")
+a$statistic
